@@ -1,5 +1,6 @@
 #include "TerrainMesh.h"
 
+#define clamp(value,minimum,maximum) max(min(value,maximum),minimum)
 TerrainMesh::TerrainMesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, int lresolution ) :
 	PlaneMesh( device, deviceContext, lresolution ) 
 {
@@ -372,145 +373,150 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 	float heightDifference[8];
 	float* _copy = heightMap;
 	float height;
-	float talus = 8.f / resolution;
+	float talus = 4/resolution;
 	float c = 0.5;
 	float NumberOver = 0.f;
 
-	for (int j = 0; j < (resolution); j++) 
+	for(int iter = 0; iter < erosionIterations; iter++)
 	{
-		for (int i = 0; i < (resolution); i++) 
+		for (int j = 0; j < (resolution); j++)
 		{
+			for (int i = 0; i < (resolution); i++)
+			{
 
-			for (int l = 0; l < 8; l++)
-			{
-				heightDifference[l] = 0;
-			}
+				int x1 = j - 1;
+				int x2 = j + 1;
 
-			if (j == 0 && i == 0)
-			{
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-				heightDifference[4] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i)];//v6
+				int y1 = i - 1;
+				int y2 = i + 1;
 
-			}
-			else if (i == resolution - 1 && j == resolution - 1)
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i - 1)];//v1
-				heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i + 1)];//v7
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + (i + 1)];//v8
-			}
-			else if (i == 0 && j == resolution - 1)
-			{
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i + 1)];//v7
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + (i + 1)];//v8
-			}
-			else if (i == resolution - 1 && j == 0)
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i - 1)];//v1
-				heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i - 1)];//v4
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-			}
-			else if (j == 0)
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i - 1)];//v1
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i - 1)];//v4
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-				heightDifference[4] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i)];//v6
-			}
-			else if (j == resolution - 1)
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i - 1)];//v1
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i + 1)];//v7
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + (i + 1)];//v8
-				heightDifference[7] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i + 1)];//v9
-			}
-			else if (i == 0)
-			{
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-				heightDifference[4] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i)];//v6
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + (i + 1)];//v8
-				heightDifference[7] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i + 1)];//v9
-			}
-			else if (i == resolution - 1)
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i - 1)];//v1
-				heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i - 1)];//v4
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-				heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i + 1)];//v7
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + (i + 1)];//v8
-			}
-			else
-			{
-				heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((j-1) * resolution) + (i - 1)];//v1
-				heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + (i - 1)];//v3
-				heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i - 1)];//v4
-				heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i)];//v5
-				heightDifference[4] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i)];//v6
-				heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[((j - 1) * resolution) + (i + 1)];//v7
-				heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j) * resolution) + (i+1)];//v8
-				heightDifference[7] = heightMap[(j * resolution) + i] - heightMap[((j + 1) * resolution) + (i + 1)];//v9
-			}
+				x1 = clamp(x1, 0, resolution - 1);
+				x2 = clamp(x2, 0, resolution - 1);
+				y1 = clamp(y1, 0, resolution - 1);
+				y2 = clamp(y2, 0, resolution - 1);
 
+				heightDifference[0] = _copy[(j * resolution) + i] - _copy[((x1 * resolution) + y1)];
+				heightDifference[1] = _copy[(j * resolution) + i] - _copy[(j * resolution) + y1];
+				heightDifference[2] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y1];
+				heightDifference[3] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + (i)];
+				heightDifference[4] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + (i)];
+				heightDifference[5] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + y2];
+				heightDifference[6] = _copy[(j * resolution) + i] - _copy[((j)* resolution) + y2];
+				heightDifference[7] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y2];
 
-			float max_dif = 0.f;
-			float total_dif = 0.f;
-			int over = 0;
+				float max_dif = 0.f;
+				float total_dif = 0.f;
+				int over = 0;
 
-			for (int z = 0; z < 8; z++)
-			{
-				if (heightDifference[z] > max_dif)
-				{		
-					max_dif = heightDifference[z];
-				};
-				if (heightDifference[z] > talus)
+				for (int z = 0; z < 4; z++)
 				{
-					total_dif += heightDifference[z];
-					NumberOver++;
+					if (heightDifference[z] > max_dif)
+					{
+						max_dif = heightDifference[z];
+					}
+					if (heightDifference[z] > talus)
+					{
+						total_dif += heightDifference[z];
+						NumberOver++;
+					}
 				}
-			}
+
+				float temp_height;
+
+				if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
+				{
+					//temp_height = _copy[(x1*resolution) + y1];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[0] / total_dif);
+					//clamp(temp_height, 1.f, -1.f);
+					//_copy[(x1*resolution) + y1] = temp_height;
+
+					_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
+				}
+				if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
+				{
+
+					//temp_height = _copy[(j*resolution) + y1];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[1] / total_dif);
+					//clamp(temp_height, 1.f, -1.f);
+					//_copy[(j*resolution) + y1] = temp_height;
+
+					_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
+				}
+				if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
+				{
+
+					//temp_height = _copy[(x2*resolution) + y1];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[2] / total_dif);
+					//clamp(temp_height, 1.f, -1.f);
+					//_copy[(x2*resolution) + y1] = temp_height;
 
 
-			if ((j - 1) != j && (i - 1) != i && heightDifference[0] != 0.f && total_dif != 0.f)
-			{
-				_copy[((j+1)*resolution) + (i + 1)] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
-			}
-			if ((i + 1) != i && heightDifference[1] != 0.f&& total_dif != 0.f)
-			{
-				_copy[(j*resolution) + (i + 1)] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
-			}
-			if ((j + 1) != j && (i - 1) != i && heightDifference[2] != 0.f&& total_dif != 0.f)
-			{
-				_copy[((j + 1)*resolution) + (i - 1)] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
-			}
-			if ((j - 1) != j && heightDifference[3] != 0.f&& total_dif != 0.f)
-			{
-				_copy[((j - 1)*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
-			}
-			if ((j + 1) != j && heightDifference[4] != 0.f && total_dif != 0.f)
-			{
-				_copy[((j + 1)*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
-			}
-			if ((j - 1) != j && (i + 1) != i && heightDifference[5] != 0.f && total_dif != 0.f)
-			{
-				_copy[((j - 1)*resolution) + (i + 1)] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
-			}
-			if ((i + 1) != i && heightDifference[6] != 0.f && total_dif != 0.f)
-			{
-				_copy[(resolution) + (i + 1)] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
-			}
-			if ((j + 1) != j && (i + 1) != i && heightDifference[7] != 0.f && total_dif != 0.f)
-			{
-				_copy[((j - 1)*resolution) + (i + 1)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
-			}
-			if (total_dif != 0.f)
-			{
-				_copy[(j *resolution) + (i)] +=  (max_dif - ((NumberOver * max_dif * talus)/total_dif));
-			}
+					_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
+				}
+				if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
+				{
 
+					//temp_height = _copy[(x1*resolution) + i];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[3] / total_dif);
+					//clamp(temp_height, 1.f, -1.f);
+					//_copy[(x1*resolution) + i] = temp_height;
+
+					_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
+				}
+				if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
+				{
+
+					//temp_height = _copy[(x2*resolution) + i];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[4] / total_dif);
+					//clamp(temp_height, 1.f, -1.f);
+					//_copy[(x2*resolution) + i] = temp_height;
+
+
+					_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
+				}
+				if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
+				{
+
+					//temp_height = _copy[(x1*resolution) + y2];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[5] / total_dif);
+					//clamp(temp_height, -1.f, 1.f);
+					//_copy[(x1*resolution) + y2] = temp_height;
+
+					_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
+				}
+				if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
+				{
+
+					//temp_height = _copy[(j*resolution) + y2];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[6] / total_dif);
+					//clamp(temp_height, -1.f, 1.f);
+					//_copy[(j*resolution) + y2] = temp_height;
+
+
+
+					_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
+				}
+				if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
+				{
+
+					//temp_height = _copy[((x2*resolution) + y2)];
+					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[7] / total_dif);
+					//clamp(temp_height, -1.f, 1.f);
+					//_copy[((x2*resolution) + y2)] = temp_height;
+
+					_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
+				}
+				if (total_dif != 0.f)
+				{
+					//temp_height = _copy[(j *resolution) + (i)];
+					//temp_height = temp_height + (max_dif - (NumberOver * max_dif * talus / total_dif));
+					//clamp(temp_height, -1.f, 1.f);
+					//_copy[(j *resolution) + (i)] = temp_height;
+					
+					_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
+				}
+
+			}
 		}
 	}
 
@@ -712,6 +718,8 @@ void TerrainMesh::Generate_Mesh(ID3D11Device * device, ID3D11DeviceContext * dev
 	delete[] indices;
 	indices = 0;
 }
+
+
 
 //Create the vertex and index buffers that will be passed along to the graphics card for rendering
 //For CMP305, you don't need to worry so much about how or why yet, but notice the Vertex buffer is DYNAMIC here as we are changing the values often

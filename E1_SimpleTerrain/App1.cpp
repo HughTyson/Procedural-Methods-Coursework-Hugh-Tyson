@@ -151,7 +151,7 @@ void App1::gui()
 
 	if (ImGui::Button("Thermal"))
 	{
-		m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 2);
+		m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
 	}
 
 	// Render UI
