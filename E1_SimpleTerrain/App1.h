@@ -16,6 +16,8 @@ public:
 
 	bool frame();
 
+	void skyDome();
+
 protected:
 	bool render();
 	void gui();
@@ -26,6 +28,7 @@ protected:
 private:
 	LightShader* shader;
 	TerrainMesh* m_Terrain;
+	SphereMesh* sky_dome;
 
 	Light* light;
 

@@ -373,7 +373,7 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 	float heightDifference[8];
 	float* _copy = heightMap;
 	float height;
-	float talus = 4/resolution;
+	float talus = 45/resolution;
 	float c = 0.5;
 	float NumberOver = 0.f;
 
@@ -421,101 +421,42 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 					}
 				}
 
-				float temp_height;
-
-				if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
-				{
-					//temp_height = _copy[(x1*resolution) + y1];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[0] / total_dif);
-					//clamp(temp_height, 1.f, -1.f);
-					//_copy[(x1*resolution) + y1] = temp_height;
-
-					_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
-				}
 				if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
 				{
-
-					//temp_height = _copy[(j*resolution) + y1];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[1] / total_dif);
-					//clamp(temp_height, 1.f, -1.f);
-					//_copy[(j*resolution) + y1] = temp_height;
-
 					_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
 				}
-				if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
+				if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
 				{
-
-					//temp_height = _copy[(x2*resolution) + y1];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[2] / total_dif);
-					//clamp(temp_height, 1.f, -1.f);
-					//_copy[(x2*resolution) + y1] = temp_height;
-
-
-					_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
+					_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
 				}
 				if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
 				{
-
-					//temp_height = _copy[(x1*resolution) + i];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[3] / total_dif);
-					//clamp(temp_height, 1.f, -1.f);
-					//_copy[(x1*resolution) + i] = temp_height;
-
 					_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
+				}
+				if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
+				{
+					_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
 				}
 				if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
 				{
-
-					//temp_height = _copy[(x2*resolution) + i];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[4] / total_dif);
-					//clamp(temp_height, 1.f, -1.f);
-					//_copy[(x2*resolution) + i] = temp_height;
-
-
 					_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
 				}
 				if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
 				{
-
-					//temp_height = _copy[(x1*resolution) + y2];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[5] / total_dif);
-					//clamp(temp_height, -1.f, 1.f);
-					//_copy[(x1*resolution) + y2] = temp_height;
-
 					_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
-				}
-				if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
-				{
-
-					//temp_height = _copy[(j*resolution) + y2];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[6] / total_dif);
-					//clamp(temp_height, -1.f, 1.f);
-					//_copy[(j*resolution) + y2] = temp_height;
-
-
-
-					_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
 				}
 				if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
 				{
-
-					//temp_height = _copy[((x2*resolution) + y2)];
-					//temp_height = temp_height + c * (max_dif - talus) * (heightDifference[7] / total_dif);
-					//clamp(temp_height, -1.f, 1.f);
-					//_copy[((x2*resolution) + y2)] = temp_height;
-
 					_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
+				}
+				if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
+				{
+					_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
 				}
 				if (total_dif != 0.f)
 				{
-					//temp_height = _copy[(j *resolution) + (i)];
-					//temp_height = temp_height + (max_dif - (NumberOver * max_dif * talus / total_dif));
-					//clamp(temp_height, -1.f, 1.f);
-					//_copy[(j *resolution) + (i)] = temp_height;
-					
 					_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
 				}
-
 			}
 		}
 	}

@@ -168,12 +168,14 @@
     <ClCompile Include="CPerlinNoise.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SkyDomeShader.cpp" />
     <ClCompile Include="TerrainMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h" />
     <ClInclude Include="CPerlinNoise.h" />
     <ClInclude Include="LightShader.h" />
+    <ClInclude Include="SkyDomeShader.h" />
     <ClInclude Include="TerrainMesh.h" />
   </ItemGroup>
   <ItemGroup>

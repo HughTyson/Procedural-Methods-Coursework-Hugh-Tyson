@@ -19,6 +19,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	// Create Mesh object and shader object
 	m_Terrain = new TerrainMesh(renderer->getDevice(), renderer->getDeviceContext());
+	sky_dome = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+
 	shader = new LightShader(renderer->getDevice(), hwnd);
 
 	light = new Light;
@@ -71,6 +73,8 @@ bool App1::frame()
 	return true;
 }
 
+
+
 bool App1::render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -90,6 +94,8 @@ bool App1::render()
 	m_Terrain->sendData(renderer->getDeviceContext());
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), light);
 	shader->render(renderer->getDeviceContext(), m_Terrain->getIndexCount());
+
+	skyDome();
 	
 	// Render GUI
 	gui();
@@ -98,6 +104,22 @@ bool App1::render()
 	renderer->endScene();
 
 	return true;
+}
+
+void App1::skyDome()
+{
+
+	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+
+	worldMatrix *= XMMatrixTranslation(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+
+	renderer->setZBuffer(false);
+
+	
+
+
+
+
 }
 
 void App1::gui()
