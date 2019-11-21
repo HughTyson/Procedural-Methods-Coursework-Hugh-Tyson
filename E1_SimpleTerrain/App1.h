@@ -44,6 +44,10 @@ private:
 
 	bool use_rigidNoise = false;
 
+
+	int terracing_octaves = 10;
+	bool use_Terracing = false;
+
 	//variables for post processing
 
 	RenderTexture* sceneTexture;

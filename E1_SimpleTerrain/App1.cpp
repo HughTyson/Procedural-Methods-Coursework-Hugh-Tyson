@@ -211,15 +211,24 @@ void App1::gui()
 
 	if (ImGui::Button("Perlin"))
 	{
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency, false);
+		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency, use_rigidNoise, use_Terracing);
 	}
 
 	if (ImGui::Button("Rigid Noise"))
 	{
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, true);
+		use_rigidNoise = true;
+		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, use_rigidNoise, use_Terracing);
+		use_rigidNoise = false;
 	}
 
-	ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 10);
+	ImGui::SliderInt("Terracing Octaves", &terracing_octaves, 1, 100);
+
+	if (ImGui::Button("Terracing Effect"))
+	{
+		m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_octaves, frequency, amplitude);
+	}
+
+	ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 30);
 	
 	if (ImGui::Button("Brownian"))
 	{
