@@ -48,6 +48,8 @@ private:
 	int terracing_octaves = 10;
 	bool use_Terracing = false;
 
+	bool use_capping = false;
+
 	//variables for post processing
 
 	RenderTexture* sceneTexture;

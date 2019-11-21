@@ -121,7 +121,6 @@ void App1::PostProcessPass()
 {
 	if (edge_detect)
 	{
-		
 		postProcessing = postPro->ApplyEdgeDetectionPostProcessing(renderer, sceneTexture, edge_detect, camera);
 	}
 }
@@ -206,6 +205,8 @@ void App1::gui()
 
 	ImGui::Text("");
 
+	ImGui::Text("Functions that use Perlin Noise");
+
 	ImGui::SliderFloat("Frequency", &frequency, 0.01, 0.5);
 	ImGui::SliderInt("Amplitude", &amplitude, 5, 45);
 
@@ -232,8 +233,12 @@ void App1::gui()
 	
 	if (ImGui::Button("Brownian"))
 	{
-		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude);
+		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude, use_capping);
 	}
+
+	ImGui::Checkbox("Cap Height", &use_capping);
+
+	ImGui::Text("Erosion");
 
 	if (ImGui::Button("Thermal"))
 	{

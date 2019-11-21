@@ -335,7 +335,7 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 
 }
 
-void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, bool use_rigid, bool use_terrace)
+void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, bool use_rigid, bool use_terrace, bool use_capping)
 {
 
 	const float scale = terrainSize / (float)resolution;
@@ -364,13 +364,13 @@ void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * devic
 
 }
 
-void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
+void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude, bool use_capping)
 {
 
 	for (int i = 0; i < octaves; i++)
 	{
 		
-		PerlinNoise(device, deviceContext, amplitude, frequency, false, false);
+		PerlinNoise(device, deviceContext, amplitude, frequency, false, false, use_capping);
 
 		amplitude*=0.5;
 		frequency *= 2;
@@ -425,7 +425,7 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 			float total_dif = 0.f;
 			int over = 0;
 
-			for (int z = 0; z < 4; z++)
+			for (int z = 0; z < 8; z++)
 			{
 				if (heightDifference[z] > max_dif)
 				{
@@ -489,7 +489,7 @@ void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceCon
 
 	for (int i = 0; i < octaves; i++)
 	{
-		PerlinNoise(device, deviceContext, amplitude, frequency, false, true);
+		PerlinNoise(device, deviceContext, amplitude, frequency, false, true, false);
 	}
 		
 }
