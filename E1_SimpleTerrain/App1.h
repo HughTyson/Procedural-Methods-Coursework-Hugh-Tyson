@@ -6,6 +6,8 @@
 #include "DXF.h"	// include dxframework
 #include "LightShader.h"
 #include "TerrainMesh.h"
+#include "PostProcessing.h"
+#include "TextureShader.h"
 
 class App1 : public BaseApplication
 {
@@ -16,7 +18,11 @@ public:
 
 	bool frame();
 
-	void skyDome();
+	void firstPass();
+
+	void PostProcessPass();
+
+	void renderPass();
 
 protected:
 	bool render();
@@ -34,9 +40,22 @@ private:
 
 	int terrainResolution = 128;
 
-	int octaves = 10;
+	int brownian_octaves = 10;
 
-	
+	bool use_rigidNoise = false;
+
+	//variables for post processing
+
+	RenderTexture* sceneTexture;
+	RenderTexture* postProcessing;
+	OrthoMesh* orthoMesh;
+
+	PostProcessing* postPro;
+
+	bool edge_detect;
+
+	TextureShader* texture_shader;
+
 };
 
 #endif

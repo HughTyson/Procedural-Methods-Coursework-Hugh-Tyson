@@ -22,6 +22,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	sky_dome = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 
 	shader = new LightShader(renderer->getDevice(), hwnd);
+	texture_shader = new TextureShader(renderer->getDevice(), hwnd);
 
 	light = new Light;
 	light->setAmbientColour( 0.25f, 0.25f, 0.25f, 1.0f );
@@ -32,6 +33,15 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	camera->setRotation( 0.0f, 30.0f,30.0f );
 
 	terrainResolution = m_Terrain->GetResolution();
+
+	//render textures
+	sceneTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	postProcessing = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	orthoMesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth, screenHeight);	// Full screen size
+
+	//post processing
+	postPro = new PostProcessing(renderer, hwnd, screenHeight, screenWidth, 3);
+	edge_detect = false;
 }
 
 
@@ -73,17 +83,22 @@ bool App1::frame()
 	return true;
 }
 
-
-
-bool App1::render()
+void App1::firstPass()
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-
-	// Clear the scene. (default blue colour)
-	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
+	if (edge_detect)
+	{
+		sceneTexture->setRenderTarget(renderer->getDeviceContext());
+		sceneTexture->clearRenderTarget(renderer->getDeviceContext(), 0.0f, 0.0f, 0.3f, 1.0f);
+	}
+	else
+	{
+		renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
+	}
 
 	// Generate the view matrix based on the camera's position.
 	camera->update();
+
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
 	// Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
 	worldMatrix = renderer->getWorldMatrix();
@@ -95,31 +110,61 @@ bool App1::render()
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), light);
 	shader->render(renderer->getDeviceContext(), m_Terrain->getIndexCount());
 
-	skyDome();
-	
+	if (edge_detect)
+	{
+		renderer->setBackBufferRenderTarget();
+	}
+
+}
+
+void App1::PostProcessPass()
+{
+	if (edge_detect)
+	{
+		
+		postProcessing = postPro->ApplyEdgeDetectionPostProcessing(renderer, sceneTexture, edge_detect, camera);
+	}
+}
+
+void App1::renderPass()
+{
+
+	if (edge_detect) //only renders to texture if glow is applied
+	{
+		renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
+
+		// RENDER THE RENDER TEXTURE SCENE
+		// Requires 2D rendering and an ortho mesh.
+		renderer->setZBuffer(false);
+		XMMATRIX worldMatrix = renderer->getWorldMatrix();
+		XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
+		XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
+
+		orthoMesh->sendData(renderer->getDeviceContext());
+		texture_shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, postProcessing->getShaderResourceView());
+		texture_shader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+		renderer->setZBuffer(true);
+	}
+
 	// Render GUI
 	gui();
 
-	// Swap the buffers
+	// Present the rendered scene to the screen.
 	renderer->endScene();
-
-	return true;
 }
 
-void App1::skyDome()
+
+
+bool App1::render()
 {
 
-	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+	firstPass();
 
-	worldMatrix *= XMMatrixTranslation(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+	PostProcessPass();
 
-	renderer->setZBuffer(false);
+	renderPass();
 
-	
-
-
-
-
+	return true;
 }
 
 void App1::gui()
@@ -142,6 +187,8 @@ void App1::gui()
 		m_Terrain->Regenerate( renderer->getDevice(), renderer->getDeviceContext() );
 	}
 
+	ImGui::Text("");
+
 	if (ImGui::Button("Flatten"))
 	{
 		m_Terrain->flatten(renderer->getDevice(), renderer->getDeviceContext());
@@ -157,18 +204,26 @@ void App1::gui()
 		m_Terrain->FaultLine(renderer->getDevice(), renderer->getDeviceContext());
 	}
 
+	ImGui::Text("");
+
 	ImGui::SliderFloat("Frequency", &frequency, 0.01, 0.5);
 	ImGui::SliderInt("Amplitude", &amplitude, 5, 45);
 
 	if (ImGui::Button("Perlin"))
 	{
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency);
+		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency, false);
 	}
 
+	if (ImGui::Button("Rigid Noise"))
+	{
+		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, true);
+	}
+
+	ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 10);
 	
 	if (ImGui::Button("Brownian"))
 	{
-		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 15, frequency, amplitude);
+		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude);
 	}
 
 	if (ImGui::Button("Thermal"))
@@ -176,6 +231,8 @@ void App1::gui()
 		m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
 	}
 
+	ImGui::Text("");
+	ImGui::Checkbox("Edge Detection", &edge_detect);
 	// Render UI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

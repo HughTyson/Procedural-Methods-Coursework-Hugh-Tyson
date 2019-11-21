@@ -26,8 +26,7 @@ void TerrainMesh::BuildHeightMap() {
 	//TODO: Give some meaning to these magic numbers! What effect does changing them have on terrain?
 	for( int j = 0; j < ( resolution ); j++ ) {
 		for( int i = 0; i < ( resolution ); i++ ) {
-			height = ( sin( (float)i * 0.1f * scale ) ) * 10.0f;
-			height += ( cos( (float)j * 0.033f * scale ) ) * 10.0f;
+			height = 1;
 			heightMap[( j * resolution ) + i] = height;
 		}
 	}	
@@ -336,7 +335,7 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 
 }
 
-void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency)
+void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, bool use_rigid)
 {
 
 	const float scale = terrainSize / (float)resolution;
@@ -344,11 +343,21 @@ void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * devic
 	for (int j = 0; j < (resolution); j++) {
 		for (int i = 0; i < (resolution); i++) {
 			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale};
-			heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
+
+			if (use_rigid)
+			{
+				heightMap[(j * resolution) + i] += 1.f - abs(CPerlinNoise::noise2(test)*amplitude);
+			}
+			else
+			{
+				heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
+			}
+			
 		}
 	}
 
 	Generate_Mesh(device, deviceContext);
+
 }
 
 void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
@@ -357,7 +366,7 @@ void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * de
 	for (int i = 0; i < 20; i++)
 	{
 		
-		PerlinNoise(device, deviceContext, amplitude, frequency);
+		PerlinNoise(device, deviceContext, amplitude, frequency, false);
 
 		amplitude*=0.5;
 		frequency *= 2;
@@ -377,91 +386,95 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 	float c = 0.5;
 	float NumberOver = 0.f;
 
-	for(int iter = 0; iter < erosionIterations; iter++)
+	
+	for (int j = 0; j < (resolution); j++)
 	{
-		for (int j = 0; j < (resolution); j++)
+		for (int i = 0; i < (resolution); i++)
 		{
-			for (int i = 0; i < (resolution); i++)
+
+			int x1 = j - 1;
+			int x2 = j + 1;
+
+			int y1 = i - 1;
+			int y2 = i + 1;
+
+			x1 = clamp(x1, 0, resolution - 1);
+			x2 = clamp(x2, 0, resolution - 1);
+			y1 = clamp(y1, 0, resolution - 1);
+			y2 = clamp(y2, 0, resolution - 1);
+
+			for (int l = 0; l < 8; l++)
 			{
+				heightDifference[l] = 0;
+			}
 
-				int x1 = j - 1;
-				int x2 = j + 1;
+			heightDifference[0] = _copy[(j * resolution) + i] - _copy[((x1 * resolution) + y1)];
+			heightDifference[1] = _copy[(j * resolution) + i] - _copy[(j * resolution) + y1];
+			heightDifference[2] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y1];
+			heightDifference[3] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + (i)];
+			heightDifference[4] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + (i)];
+			heightDifference[5] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + y2];
+			heightDifference[6] = _copy[(j * resolution) + i] - _copy[((j)* resolution) + y2];
+			heightDifference[7] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y2];
 
-				int y1 = i - 1;
-				int y2 = i + 1;
+			float max_dif = 0.f;
+			float total_dif = 0.f;
+			int over = 0;
 
-				x1 = clamp(x1, 0, resolution - 1);
-				x2 = clamp(x2, 0, resolution - 1);
-				y1 = clamp(y1, 0, resolution - 1);
-				y2 = clamp(y2, 0, resolution - 1);
+			for (int z = 0; z < 4; z++)
+			{
+				if (heightDifference[z] > max_dif)
+				{
+					max_dif = heightDifference[z];
+				}
+				if (heightDifference[z] > talus)
+				{
+					total_dif += heightDifference[z];
+					NumberOver++;
+				}
+			}
 
-				heightDifference[0] = _copy[(j * resolution) + i] - _copy[((x1 * resolution) + y1)];
-				heightDifference[1] = _copy[(j * resolution) + i] - _copy[(j * resolution) + y1];
-				heightDifference[2] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y1];
-				heightDifference[3] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + (i)];
-				heightDifference[4] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + (i)];
-				heightDifference[5] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + y2];
-				heightDifference[6] = _copy[(j * resolution) + i] - _copy[((j)* resolution) + y2];
-				heightDifference[7] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y2];
-
-				float max_dif = 0.f;
-				float total_dif = 0.f;
-				int over = 0;
-
-				for (int z = 0; z < 4; z++)
-				{
-					if (heightDifference[z] > max_dif)
-					{
-						max_dif = heightDifference[z];
-					}
-					if (heightDifference[z] > talus)
-					{
-						total_dif += heightDifference[z];
-						NumberOver++;
-					}
-				}
-
-				if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
-				{
-					_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
-				}
-				if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
-				{
-					_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
-				}
-				if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
-				{
-					_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
-				}
-				if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
-				{
-					_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
-				}
-				if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
-				{
-					_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
-				}
-				if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
-				{
-					_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
-				}
-				if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
-				{
-					_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
-				}
-				if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
-				{
-					_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
-				}
-				if (total_dif != 0.f)
-				{
-					_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
-				}
+			if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
+			{
+				heightMap[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
+			}
+			if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
+			{
+				heightMap[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
+			}
+			if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
+			{
+				heightMap[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
+			}
+			if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
+			{
+				heightMap[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
+			}
+			if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
+			{
+				heightMap[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
+			}
+			if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
+			{
+				heightMap[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
+			}
+			if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
+			{
+				heightMap[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
+			}
+			if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
+			{
+				heightMap[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
+			}
+			if (total_dif != 0.f)
+			{
+				heightMap[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
 			}
 		}
 	}
+	
 
-	heightMap = _copy;
+
 
 	Generate_Mesh(device, deviceContext);
 

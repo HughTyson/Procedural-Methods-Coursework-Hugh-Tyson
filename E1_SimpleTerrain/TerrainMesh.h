@@ -18,7 +18,7 @@ public:
 
 	void FaultLine(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 
-	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency);
+	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, bool use_rigid);
 
 	void BrownianMotion(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float ampitude);
 
@@ -27,8 +27,6 @@ public:
 	void ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int erosionIterations);
 
 	void HydraulicErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float carryingCapacity, float depositionSpeed, int iterations, int drops, float persistence);
-
-	int ClampNumber(int number, int clamp_value, int min_clamp_value);
 
 private:
 	void CreateBuffers( ID3D11Device* device, VertexType* vertices, unsigned long* indices );

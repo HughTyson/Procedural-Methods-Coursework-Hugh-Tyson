@@ -2,11 +2,11 @@
 
 
 
-SkyDomeShader::SkyDomeShader()
-{
-}
-
-
-SkyDomeShader::~SkyDomeShader()
-{
-}
+//SkyDomeShader::SkyDomeShader()
+//{
+//}
+//
+//
+//SkyDomeShader::~SkyDomeShader()
+//{
+//}
