@@ -15,7 +15,11 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	textureMgr->loadTexture(L"grass", L"res/Grass.png");
 	textureMgr->loadTexture(L"rock", L"res/rock.png");
-	textureMgr->loadTexture(L"dirt", L"res/dirt.png");
+	textureMgr->loadTexture(L"dirt", L"res/dirtColour.jpg");
+
+	textureMgr->loadTexture(L"red", L"res/redColour.jpg");
+	textureMgr->loadTexture(L"black", L"res/blackColour.jpg");
+	textureMgr->loadTexture(L"white", L"res/whiteColour.png");
 
 	// Create Mesh object and shader object
 	m_Terrain = new TerrainMesh(renderer->getDevice(), renderer->getDeviceContext());
@@ -107,7 +111,17 @@ void App1::firstPass()
 
 	// Send geometry data, set shader parameters, render object with shader
 	m_Terrain->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), light);
+
+	if (use_colours)
+	{
+		shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"white"), textureMgr->getTexture(L"red"), textureMgr->getTexture(L"black"), light);
+	}
+	else if (!use_colours)
+	{
+		shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), light);
+	}
+
+
 	shader->render(renderer->getDeviceContext(), m_Terrain->getIndexCount());
 
 	if (edge_detect)
@@ -210,17 +224,26 @@ void App1::gui()
 	ImGui::SliderFloat("Frequency", &frequency, 0.01, 0.5);
 	ImGui::SliderInt("Amplitude", &amplitude, 5, 45);
 
+	ImGui::Text("");
+
 	if (ImGui::Button("Perlin"))
 	{
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency, use_rigidNoise, use_Terracing);
+		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency);
 	}
 
 	if (ImGui::Button("Rigid Noise"))
-	{
-		use_rigidNoise = true;
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, use_rigidNoise, use_Terracing);
-		use_rigidNoise = false;
+	{	
+		m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);	
 	}
+
+	if (ImGui::Button("Inverse Rigid Noise"))
+	{
+
+		m_Terrain->InverseRigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);
+
+	}
+
+	ImGui::Text("");
 
 	ImGui::SliderInt("Terracing Octaves", &terracing_octaves, 1, 100);
 
@@ -229,14 +252,24 @@ void App1::gui()
 		m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_octaves, frequency, amplitude);
 	}
 
+	ImGui::Text("");
+
 	ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 30);
 	
 	if (ImGui::Button("Brownian"))
 	{
-		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude, use_capping);
+		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude);
 	}
 
-	ImGui::Checkbox("Cap Height", &use_capping);
+	ImGui::Text("");
+
+	ImGui::SliderFloat("Power", &power, 0.1, 8);
+	if (ImGui::Button("Valley"))
+	{
+		m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power,frequency, amplitude);
+	}
+
+	ImGui::Text("");
 
 	ImGui::Text("Erosion");
 
@@ -246,9 +279,15 @@ void App1::gui()
 	}
 
 	ImGui::Text("");
-	ImGui::Checkbox("Edge Detection", &edge_detect);
+	ImGui::Checkbox("Edge Detection", &edge_detect);	
+	
+	ImGui::Text("");
+	ImGui::Checkbox("Use Colour", &use_colours);
+
 	// Render UI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+
 }
 

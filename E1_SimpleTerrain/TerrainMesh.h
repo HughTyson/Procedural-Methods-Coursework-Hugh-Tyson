@@ -1,6 +1,7 @@
 #pragma once
 #include "PlaneMesh.h"
 #include "CPerlinNoise.h"
+#include <math.h>
 class TerrainMesh :
 	public PlaneMesh {
 public:
@@ -18,9 +19,9 @@ public:
 
 	void FaultLine(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 
-	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, bool use_rigid, bool use_terrace, bool use_capping);
+	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency);
 
-	void BrownianMotion(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float ampitude, bool use_capping);
+	void BrownianMotion(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float ampitude);
 
 	void flatten(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 
@@ -28,7 +29,13 @@ public:
 
 	void Terrace(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float amplitude);
 
+	void RigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
+
+	void InverseRigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
+
 	void Capping(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int cap_height, float frequency, float amplitude);
+
+	void Redistribution(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float pow, float frequency, float amplitude);
 
 	void HydraulicErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float carryingCapacity, float depositionSpeed, int iterations, int drops, float persistence);
 

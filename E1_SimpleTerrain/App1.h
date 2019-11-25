@@ -43,12 +43,14 @@ private:
 	int brownian_octaves = 10;
 
 	bool use_rigidNoise = false;
-
+	bool use_inverserigidNoise = false;
 
 	int terracing_octaves = 10;
 	bool use_Terracing = false;
 
 	bool use_capping = false;
+
+	float power = 0;
 
 	//variables for post processing
 
@@ -61,6 +63,8 @@ private:
 	bool edge_detect;
 
 	TextureShader* texture_shader;
+
+	bool use_colours = false;
 
 };
 

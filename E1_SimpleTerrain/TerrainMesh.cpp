@@ -335,28 +335,20 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 
 }
 
-void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, bool use_rigid, bool use_terrace, bool use_capping)
+void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency)
 {
 
 	const float scale = terrainSize / (float)resolution;
 
-	for (int j = 0; j < (resolution); j++) {
-		for (int i = 0; i < (resolution); i++) {
+	for (int j = 0; j < (resolution); j++) 
+	{
+		for (int i = 0; i < (resolution); i++) 
+		{
 			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale};
 
-			if (use_rigid)
-			{
-				heightMap[(j * resolution) + i] += 1.f - abs(CPerlinNoise::noise2(test)*amplitude);
-			}
-			else if (use_terrace)
-			{
-				heightMap[(j * resolution) + i] += floor((CPerlinNoise::noise2(test)*amplitude) * 1.f)/20.f;
-			}
-			else
-			{
-				heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
-			}
-			
+			heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
+
+
 		}
 	}
 
@@ -364,19 +356,88 @@ void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * devic
 
 }
 
-void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude, bool use_capping)
+void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
 {
 
-	for (int i = 0; i < octaves; i++)
+	for (int i = 0; i < octaves; i++) //loop for the amount of octaves for fBm
 	{
 		
-		PerlinNoise(device, deviceContext, amplitude, frequency, false, false, use_capping);
+		PerlinNoise(device, deviceContext, amplitude, frequency); //call the perlin noise function with current amplitude and frequency
 
-		amplitude*=0.5;
-		frequency *= 2;
+		amplitude*=0.5; // half the amplitude
+		frequency *= 2; // double the frequency
 		
 	}
 
+
+}
+
+void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
+{
+
+	for (int j = 0; j < (resolution); j++) {
+		for (int i = 0; i < (resolution); i++) {
+			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i] * 1.f)/ 4.f;
+		}
+	}
+
+	Generate_Mesh( device, deviceContext);
+		
+}
+
+void TerrainMesh::RigidNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float frequency, float amplitude)
+{
+	const float scale = terrainSize / (float)resolution;
+
+	for (int j = 0; j < (resolution); j++) // loop for resolution - y
+	{
+		for (int i = 0; i < (resolution); i++) // loop for resolution - x
+		{
+			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale }; //set point to be passed into perlin noise function
+
+			heightMap[(j * resolution) + i] += -(1.f - abs(CPerlinNoise::noise2(test)*amplitude)); //set heightmap point to inverse of 1 subtracted by the absolute(positive) value of perlin noise
+
+		}
+	}
+
+	Generate_Mesh(device, deviceContext); //change mesh
+
+}
+
+void TerrainMesh::InverseRigidNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float frequency, float amplitude)
+{
+	const float scale = terrainSize / (float)resolution;
+
+	for (int j = 0; j < (resolution); j++) // loop for resolution - y
+	{
+		for (int i = 0; i < (resolution); i++) // loop for resolution - x
+		{
+			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale };  //set point to be passed into perlin noise function
+
+			heightMap[(j * resolution) + i] += (1.f - abs(CPerlinNoise::noise2(test)*amplitude)); //set heightmap point to 1 subtracted by the absolute(positive) value of perlin noise
+
+		}
+	}
+
+	Generate_Mesh(device, deviceContext);
+}
+
+void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float power, float frequency, float amplitude)
+{
+
+	const float scale = terrainSize / (float)resolution;
+
+	for (int j = 0; j < (resolution); j++) 
+	{
+		for (int i = 0; i < (resolution); i++) 
+		{
+			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale };
+
+			heightMap[(j * resolution) + i] += pow(CPerlinNoise::noise2(test)*amplitude,power);
+		
+		}
+	}
+	Generate_Mesh(device, deviceContext);
 
 }
 
@@ -386,7 +447,7 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 	float heightDifference[8];
 	float* _copy = heightMap;
 	float height;
-	float talus = 45/resolution;
+	float talus = 8/resolution;
 	float c = 0.5;
 	float NumberOver = 0.f;
 
@@ -412,14 +473,14 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 				heightDifference[l] = 0;
 			}
 
-			heightDifference[0] = _copy[(j * resolution) + i] - _copy[((x1 * resolution) + y1)];
-			heightDifference[1] = _copy[(j * resolution) + i] - _copy[(j * resolution) + y1];
-			heightDifference[2] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y1];
-			heightDifference[3] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + (i)];
-			heightDifference[4] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + (i)];
-			heightDifference[5] = _copy[(j * resolution) + i] - _copy[(x1 * resolution) + y2];
-			heightDifference[6] = _copy[(j * resolution) + i] - _copy[((j)* resolution) + y2];
-			heightDifference[7] = _copy[(j * resolution) + i] - _copy[(x2 * resolution) + y2];
+			heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((x1 * resolution) + y1)];
+			heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + y1];
+			heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[(x2 * resolution) + y1];
+			heightDifference[3] = heightMap[(j * resolution) + i] - heightMap[(x1 * resolution) + (i)];
+			heightDifference[4] = heightMap[(j * resolution) + i] - heightMap[(x2 * resolution) + (i)];
+			heightDifference[5] = heightMap[(j * resolution) + i] - heightMap[(x1 * resolution) + y2];
+			heightDifference[6] = heightMap[(j * resolution) + i] - heightMap[((j)* resolution) + y2];
+			heightDifference[7] = heightMap[(j * resolution) + i] - heightMap[(x2 * resolution) + y2];
 
 			float max_dif = 0.f;
 			float total_dif = 0.f;
@@ -427,71 +488,65 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 
 			for (int z = 0; z < 8; z++)
 			{
-				if (heightDifference[z] > max_dif)
-				{
-					max_dif = heightDifference[z];
-				}
+
 				if (heightDifference[z] > talus)
 				{
 					total_dif += heightDifference[z];
-					NumberOver++;
-				}
+					NumberOver++;				
+					
+
+				}				
+					if (heightDifference[z] > max_dif)
+					{
+						max_dif = heightDifference[z];
+					}
+
 			}
 
 			if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
 			{
-				heightMap[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
+				_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
 			}
 			if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
 			{
-				heightMap[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
+				_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
 			}
 			if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
 			{
-				heightMap[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
+				_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
 			}
 			if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
 			{
-				heightMap[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
+				_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
 			}
 			if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
 			{
-				heightMap[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
+				_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
 			}
 			if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
 			{
-				heightMap[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
+				_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
 			}
 			if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
 			{
-				heightMap[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
+				_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
 			}
 			if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
 			{
-				heightMap[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
+				_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
 			}
 			if (total_dif != 0.f)
 			{
-				heightMap[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
+				_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
 			}
 		}
 	}
 	
-
+	heightMap = _copy;
 
 
 	Generate_Mesh(device, deviceContext);
 
-}
-
-void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
-{
-
-	for (int i = 0; i < octaves; i++)
-	{
-		PerlinNoise(device, deviceContext, amplitude, frequency, false, true, false);
-	}
-		
 }
 
 void TerrainMesh::flatten(ID3D11Device * device, ID3D11DeviceContext * deviceContext)

@@ -20,8 +20,6 @@ struct InputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
-	float3 worldPosition : TEXCOORD1;
-	float2 tex2 : TEXCOORD2;
 
 };
 
@@ -38,36 +36,36 @@ float4 main(InputType input) : SV_TARGET
 	float4 textureColour;
 	float4 lightColour;
 	float4 grassColour;
-	float4 slopeColour;
+	float4 rockColour;
 	float dirtColour;
 
 	float blendAmount;
 
 	grassColour = texture0.Sample(sampler0, input.tex);
-	slopeColour = texture1.Sample(sampler0, input.tex);
+	rockColour = texture1.Sample(sampler0, input.tex);
 	dirtColour = texture2.Sample(sampler0, input.tex);
-
+	
 	float slope = 1.0f - input.normal.y;
-
+	
 	if (slope < 0.2)
 	{
 		blendAmount = slope / 0.2f;
-		textureColour = lerp(grassColour, slopeColour, blendAmount);
+		textureColour = lerp(grassColour, dirtColour, blendAmount);
 	}
 	else if ((slope < 0.7f) && (slope >= 0.2f))
 	{
-		blendAmount = (slope - 0.2f) * (1.0f / (0.7f - 0.2f));
-		textureColour = lerp(slopeColour, dirtColour, blendAmount);
+		blendAmount = (slope - 0.2f) * 2;
+
+		textureColour = lerp(dirtColour, rockColour, blendAmount);
 	}
 
 	if (slope >= 0.7)
 	{
-		textureColour = dirtColour;
+		textureColour = rockColour;
 	}
 
 	lightColour = ambientColour + calculateLighting( -lightDirection, input.normal, diffuseColour);
 	
-
 	return lightColour * textureColour;
 }
 
