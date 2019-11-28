@@ -532,6 +532,7 @@ void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * de
 {
 
 	const float scale = terrainSize / (float)resolution;
+	float noise_value;
 
 	for (int j = 0; j < (resolution); j++) 
 	{
@@ -539,8 +540,8 @@ void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * de
 		{
 			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale };
 
-			heightMap[(j * resolution) + i] += pow(CPerlinNoise::noise2(test)*amplitude,power);
-		
+			noise_value = (abs(heightMap[(j * resolution) + i]));
+			heightMap[(j * resolution) + i] = pow((noise_value), power);//*amplitude;
 		}
 	}
 	Generate_Mesh(device, deviceContext);

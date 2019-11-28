@@ -1,2 +1,21 @@
-﻿  compilation object save succeeded; see F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\E1_SimpleTerrain\EdgeDetection_ps.cso
-  E1_SimpleTerrain.vcxproj -> F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\x64\Debug\E1_SimpleTerrain.exe
+﻿  TerrainMesh.cpp
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\cperlinnoise.h(50): warning C4244: 'return': conversion from 'double' to 'const float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(51): warning C4101: 'indexBufferDesc': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(52): warning C4101: 'vertexData': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(52): warning C4101: 'indexData': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(51): warning C4101: 'vertexBufferDesc': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(425): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(445): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(478): warning C4101: 'current_height': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(479): warning C4101: 'floor_height': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(481): warning C4101: 'more': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(480): warning C4101: 'math': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(504): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(523): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(557): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(556): warning C4101: 'height': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(690): warning C4101: 'indexBufferDesc': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(691): warning C4101: 'vertexData': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(691): warning C4101: 'indexData': unreferenced local variable
+m:\procedural methods\procedural-methods-coursework-hugh-tyson\e1_simpleterrain\terrainmesh.cpp(690): warning C4101: 'vertexBufferDesc': unreferenced local variable
+  E1_SimpleTerrain.vcxproj -> M:\Procedural Methods\Procedural-Methods-Coursework-Hugh-Tyson\x64\Debug\E1_SimpleTerrain.exe
