@@ -16,11 +16,18 @@ private:
 		float padding;
 	};
 
+	struct WaterBufferType
+	{
+		float water_height;
+		int use_water;
+		XMFLOAT2 padding;
+	};
+
 public:
 	LightShader(ID3D11Device* device, HWND hwnd);
 	~LightShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* texture2, ID3D11ShaderResourceView* texture3, Light* light);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* texture2, ID3D11ShaderResourceView* texture3, ID3D11ShaderResourceView* texture4, Light* light, float water_height, bool use_height);
 
 private:
 	void initShader(const wchar_t* cs, const wchar_t* ps);
@@ -29,5 +36,6 @@ private:
 	ID3D11Buffer * matrixBuffer;
 	ID3D11SamplerState* sampleState;
 	ID3D11Buffer* lightBuffer;
+	ID3D11Buffer* waterBuffer;
 };
 

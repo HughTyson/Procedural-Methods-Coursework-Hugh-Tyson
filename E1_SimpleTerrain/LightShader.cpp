@@ -45,6 +45,7 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC waterBufferDesc;
 
 	// Load (+ compile) shader files
 	loadVertexShader(vsFilename);
@@ -71,6 +72,14 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState);
 
+	waterBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	waterBufferDesc.ByteWidth = sizeof(WaterBufferType);
+	waterBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	waterBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	waterBufferDesc.MiscFlags = 0;
+	waterBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&waterBufferDesc, NULL, &waterBuffer);
+
 	// Setup light buffer
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
 	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
@@ -85,14 +94,13 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* grass, ID3D11ShaderResourceView* rock, ID3D11ShaderResourceView* dirt, Light* light)
+void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* grass, ID3D11ShaderResourceView* rock, ID3D11ShaderResourceView* dirt, ID3D11ShaderResourceView* sand, Light* light, float water_height, bool use_water)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	
 	XMMATRIX tworld, tview, tproj;
-
 
 	// Transpose the matrices to prepare them for the shader.
 	tworld = XMMatrixTranspose(worldMatrix);
@@ -116,11 +124,30 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	lightPtr->direction = light->getDirection();
 	lightPtr->padding = 0.0f;
 	deviceContext->Unmap(lightBuffer, 0);
-	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);	
+	
+	WaterBufferType* waterPtr;
+	deviceContext->Map(waterBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	waterPtr = (WaterBufferType*)mappedResource.pData;
+	waterPtr->water_height = water_height;
+
+	if (use_water)
+	{
+		waterPtr->use_water = 1;
+	}
+	else if (!use_water)
+	{
+		waterPtr->use_water = 0;
+	}
+	
+	waterPtr->padding = XMFLOAT2(0.f, 0.f);
+	deviceContext->Unmap(waterBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &waterBuffer);
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &grass);
 	deviceContext->PSSetShaderResources(1, 1, &rock);
 	deviceContext->PSSetShaderResources(2, 1, &dirt);
+	deviceContext->PSSetShaderResources(3, 1, &sand);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
 }

@@ -1,5 +1,2 @@
-﻿F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\E1_SimpleTerrain\shaders\light_ps.hlsl(46,2-50): warning X3206: implicit truncation of vector type
-F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\E1_SimpleTerrain\shaders\light_ps.hlsl(60,2): warning X4000: use of potentially uninitialized variable (textureColour)
-  
-  compilation object save succeeded; see F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\E1_SimpleTerrain\light_ps.cso
+﻿  compilation object save succeeded; see F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\E1_SimpleTerrain\EdgeDetection_ps.cso
   E1_SimpleTerrain.vcxproj -> F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\x64\Debug\E1_SimpleTerrain.exe

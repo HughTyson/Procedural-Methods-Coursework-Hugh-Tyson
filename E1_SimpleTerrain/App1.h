@@ -8,6 +8,8 @@
 #include "TerrainMesh.h"
 #include "PostProcessing.h"
 #include "TextureShader.h"
+#include "WaterMesh.h"
+#include "WaterShader.h"
 
 class App1 : public BaseApplication
 {
@@ -33,10 +35,16 @@ protected:
 
 private:
 	LightShader* shader;
+	WaterShader* water_shader;
 	TerrainMesh* m_Terrain;
+	WaterMesh* m_Water;
 	SphereMesh* sky_dome;
 
 	Light* light;
+
+	//terrain variables
+
+	bool enable_terrain = true;;
 
 	int terrainResolution = 128;
 
@@ -45,7 +53,7 @@ private:
 	bool use_rigidNoise = false;
 	bool use_inverserigidNoise = false;
 
-	int terracing_octaves = 10;
+	float terracing_octaves = 0.4;
 	bool use_Terracing = false;
 
 	bool use_capping = false;
@@ -65,6 +73,16 @@ private:
 	TextureShader* texture_shader;
 
 	bool use_colours = false;
+
+	//water variables
+
+	bool enable_water;
+	float water_frequency;
+	float water_amplitude;
+	float dt;
+	float speed;
+	float water_height;
+	float transparent_value;
 
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "PlaneMesh.h"
 #include "CPerlinNoise.h"
+#include <vector>
 #include <math.h>
 class TerrainMesh :
 	public PlaneMesh {
@@ -19,7 +20,11 @@ public:
 
 	void FaultLine(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 
+	void ParticleDeposition(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int particles, bool inverse);
+
 	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency);
+
+	void PerlinNoise3D(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, float time);
 
 	void BrownianMotion(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float ampitude);
 
@@ -27,7 +32,7 @@ public:
 
 	void ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int erosionIterations);
 
-	void Terrace(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float amplitude);
+	void Terrace(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float octaves, float frequency, float amplitude);
 
 	void RigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
 

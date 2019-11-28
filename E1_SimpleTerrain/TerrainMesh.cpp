@@ -257,8 +257,8 @@ void TerrainMesh::smoothing(ID3D11Device * device, ID3D11DeviceContext * deviceC
 			{
 				values_used++;
 				average += heightMap[(y + 1)*resolution + (x)];
-				topL += 1;
-				topR += 1;
+topL += 1;
+topR += 1;
 			}
 
 			if (topL == 2)
@@ -335,6 +335,82 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 
 }
 
+void TerrainMesh::ParticleDeposition(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int particles, bool inverse)
+{
+
+	int radius = 2;
+	int amount_of_points;
+
+	if (radius == 1)
+	{
+		amount_of_points = 6;
+	}
+	else if (radius == 2)
+	{
+		amount_of_points = 23;
+	}
+	int x_val, y_val;
+	int x1, x2, y1, y2;
+	float current_height;
+	float surrounding_heights[23];
+
+	x_val = rand() % resolution;
+	y_val = rand() % resolution;
+
+	for (int i = 0; i < radius; i++)
+	{
+		x1 = x_val - i;
+		x2 = x_val + i;
+
+		y1 = y_val - i;
+		y2 = y_val + i;
+
+		clamp(x1, 0, resolution - 1);
+		clamp(x2, 0, resolution - 1);
+		clamp(y1, 0, resolution - 1);
+		clamp(y2, 0, resolution - 1);
+
+
+		surrounding_heights[0] = heightMap[((x1 * resolution) + y1)];
+		surrounding_heights[1] = heightMap[(y_val * resolution) + y1];
+		surrounding_heights[2] = heightMap[(x2 * resolution) + y1];
+		surrounding_heights[3] = heightMap[(x1 * resolution) + (x_val)];
+		surrounding_heights[4] = heightMap[(x2 * resolution) + (x_val)];
+		surrounding_heights[5] = heightMap[(x1 * resolution) + y2];
+		surrounding_heights[6] = heightMap[((y_val)* resolution) + y2];
+		surrounding_heights[7] = heightMap[(x2 * resolution) + y2];
+	}
+
+	for (int i = 0; i < particles; i++)
+	{
+
+		current_height = heightMap[(y_val*resolution) + x_val];
+
+		if (heightMap[(y_val*resolution) + (x_val + 1)] != current_height)
+		{
+			heightMap[(y_val*resolution) + (x_val + 1)]++;
+		}
+		else if (heightMap[(y_val*resolution) + (x_val - 1)] != current_height)
+		{
+			heightMap[(y_val*resolution) + (x_val - 1)]++;
+		}
+		else if (heightMap[((y_val + 1)*resolution) + x_val] != current_height)
+		{
+			heightMap[((y_val + 1)*resolution) + x_val]++;
+		}
+		else if (heightMap[((y_val - 1)*resolution) + x_val] != current_height)
+		{
+			heightMap[((y_val - 1)*resolution) + x_val]++;
+		}
+		else
+		{
+			heightMap[(y_val*resolution) + x_val] = heightMap[(y_val*resolution) + x_val]++;
+		}
+	}
+
+	Generate_Mesh(device, deviceContext);
+}
+
 void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency)
 {
 
@@ -348,12 +424,29 @@ void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * devic
 
 			heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
 
-
 		}
 	}
 
 	Generate_Mesh(device, deviceContext);
 
+}
+
+void TerrainMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, float time)
+{
+
+	const float scale = terrainSize / (float)resolution;
+
+	for (int j = 0; j < (resolution); j++)
+	{
+		for (int i = 0; i < (resolution); i++)
+		{
+			float test[3] = { (float)((i * frequency*scale)+ time), (float)j *frequency *scale, (float)time};
+
+			heightMap[(j * resolution) + i] = CPerlinNoise::noise3(test)*amplitude;
+		}
+	}
+
+	Generate_Mesh(device, deviceContext);
 }
 
 void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
@@ -372,16 +465,29 @@ void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * de
 
 }
 
-void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
+void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float octaves, float frequency, float amplitude)
 {
+
+	//for (int j = 0; j < (resolution); j++) {
+	//	for (int i = 0; i < (resolution); i++) {
+	//		heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i])/ (float)octaves;
+	//	}
+	//}
+
+	float width = octaves;
+	float current_height;
+	float floor_height;
+	float math;
+	float more;
 
 	for (int j = 0; j < (resolution); j++) {
 		for (int i = 0; i < (resolution); i++) {
-			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i] * 1.f)/ 4.f;
+
+			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i]) / (float)octaves;
 		}
 	}
 
-	Generate_Mesh( device, deviceContext);
+	Generate_Mesh(device, deviceContext);
 		
 }
 

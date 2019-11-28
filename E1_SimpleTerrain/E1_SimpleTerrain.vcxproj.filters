@@ -45,6 +45,12 @@
     <ClCompile Include="EdgeDetectionShader.cpp">
       <Filter>Post Processing</Filter>
     </ClCompile>
+    <ClCompile Include="WaterMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h">
@@ -71,6 +77,12 @@
     <ClInclude Include="EdgeDetectionShader.h">
       <Filter>Post Processing</Filter>
     </ClInclude>
+    <ClInclude Include="WaterMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\light_ps.hlsl">
@@ -89,6 +101,9 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="EdgeDetection_vs.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="Water_ps.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

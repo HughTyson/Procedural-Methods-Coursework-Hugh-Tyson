@@ -51,7 +51,7 @@ float4 main(InputType input) : SV_TARGET
 	horizontal
 
 		-1 0 1
-		-1 0 2
+		-2 0 2
 		-1 0 1
 
 	verticle

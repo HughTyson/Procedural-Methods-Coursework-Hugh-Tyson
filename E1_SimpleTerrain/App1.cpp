@@ -6,6 +6,8 @@ App1::App1()
 {
 	m_Terrain = nullptr;
 	shader = nullptr;
+
+	dt = 0;
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -20,12 +22,18 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureMgr->loadTexture(L"red", L"res/redColour.jpg");
 	textureMgr->loadTexture(L"black", L"res/blackColour.jpg");
 	textureMgr->loadTexture(L"white", L"res/whiteColour.png");
+	textureMgr->loadTexture(L"blue", L"res/blueColour.jpg");
+
+	textureMgr->loadTexture(L"water", L"res/water.jpg");
+	textureMgr->loadTexture(L"sand", L"res/sand.jpg");
 
 	// Create Mesh object and shader object
 	m_Terrain = new TerrainMesh(renderer->getDevice(), renderer->getDeviceContext());
+	m_Water = new WaterMesh(renderer->getDevice(), renderer->getDeviceContext());
 	sky_dome = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 
 	shader = new LightShader(renderer->getDevice(), hwnd);
+	water_shader = new WaterShader(renderer->getDevice(), hwnd);
 	texture_shader = new TextureShader(renderer->getDevice(), hwnd);
 
 	light = new Light;
@@ -46,6 +54,16 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	//post processing
 	postPro = new PostProcessing(renderer, hwnd, screenHeight, screenWidth, 3);
 	edge_detect = false;
+
+	//water init
+
+	enable_water = false;
+	water_amplitude = 0.1;
+	water_frequency = 0.1;
+	water_height = 0;
+	speed = 0.f;
+	transparent_value = 0.8;
+
 }
 
 
@@ -71,6 +89,9 @@ App1::~App1()
 bool App1::frame()
 {
 	bool result;
+
+	dt += (timer->getTime() * speed);
+	m_Water->PerlinNoise3D(renderer->getDevice(), renderer->getDeviceContext(), water_amplitude, water_frequency, dt);
 
 	result = BaseApplication::frame();
 	if (!result)
@@ -110,19 +131,38 @@ void App1::firstPass()
 	projectionMatrix = renderer->getProjectionMatrix();
 
 	// Send geometry data, set shader parameters, render object with shader
-	m_Terrain->sendData(renderer->getDeviceContext());
 
-	if (use_colours)
+	if (enable_terrain)
 	{
-		shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"white"), textureMgr->getTexture(L"red"), textureMgr->getTexture(L"black"), light);
+		m_Terrain->sendData(renderer->getDeviceContext());
+
+		if (use_colours)
+		{
+			shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"white"), textureMgr->getTexture(L"red"), textureMgr->getTexture(L"black"), textureMgr->getTexture(L"blue"), light, water_height, enable_water);
+		}
+		else if (!use_colours)
+		{
+			shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), textureMgr->getTexture(L"sand"), light, water_height, enable_water);
+		}
+
+		shader->render(renderer->getDeviceContext(), m_Terrain->getIndexCount());
 	}
-	else if (!use_colours)
+
+
+	//water mesh
+	if (enable_water)
 	{
-		shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), textureMgr->getTexture(L"rock"), textureMgr->getTexture(L"dirt"), light);
-	}
+		renderer->setAlphaBlending(true);
 
+		worldMatrix = XMMatrixTranslation(0, water_height, 0);
 
-	shader->render(renderer->getDeviceContext(), m_Terrain->getIndexCount());
+		m_Water->sendData(renderer->getDeviceContext());
+		water_shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"water"), light, transparent_value);
+		water_shader->render(renderer->getDeviceContext(), m_Water->getIndexCount());
+
+		renderer->setAlphaBlending(false);
+	}	
+
 
 	if (edge_detect)
 	{
@@ -189,100 +229,133 @@ void App1::gui()
 
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
-	ImGui::Text( "Camera Pos: (%.2f, %.2f, %.2f)", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z );
+	ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 
-	ImGui::SliderInt( "Terrain Resolution", &terrainResolution, 2, 1024 );
-	if( ImGui::Button( "Regenerate Terrain" ) ) {
-		if( terrainResolution != m_Terrain->GetResolution() ) {
-			m_Terrain->Resize( terrainResolution );
+	ImGui::Text("");
+
+	ImGui::Checkbox("Render Terrain", &enable_terrain);
+
+	if(enable_terrain)
+	{
+		ImGui::SliderInt("Terrain Resolution", &terrainResolution, 2, 1024);
+		if (ImGui::Button("Regenerate Terrain")) {
+			if (terrainResolution != m_Terrain->GetResolution()) {
+				m_Terrain->Resize(terrainResolution);
+			}
+			m_Terrain->Regenerate(renderer->getDevice(), renderer->getDeviceContext());
 		}
-		m_Terrain->Regenerate( renderer->getDevice(), renderer->getDeviceContext() );
+
+		ImGui::Text("");
+
+		if (ImGui::Button("Flatten"))
+		{
+			m_Terrain->flatten(renderer->getDevice(), renderer->getDeviceContext());
+		}
+
+		if (ImGui::Button("Smooth"))
+		{
+			m_Terrain->smoothing(renderer->getDevice(), renderer->getDeviceContext());
+		}
+
+		if (ImGui::Button("Faultline"))
+		{
+			m_Terrain->FaultLine(renderer->getDevice(), renderer->getDeviceContext());
+		}
+
+		if (ImGui::Button("Particle Deposition"))
+		{
+			m_Terrain->ParticleDeposition(renderer->getDevice(), renderer->getDeviceContext(), 40, false);
+		}
+
+		ImGui::Text("");
+
+		ImGui::Text("Functions that use Perlin Noise");
+
+		ImGui::SliderFloat("Terrain Frequency", &frequency, 0.01, 0.5);
+		ImGui::SliderInt("Terrain Amplitude", &amplitude, 5, 45);
+		
+		ImGui::Text("");
+
+
+
+		if (ImGui::Button("Perlin"))
+		{
+			m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency);
+		}
+
+		if (ImGui::Button("Rigid Noise"))
+		{
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);
+		}
+
+		if (ImGui::Button("Inverse Rigid Noise"))
+		{
+
+			m_Terrain->InverseRigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);
+
+		}
+
+		if (ImGui::Button("Perlin3D"))
+		{
+			m_Terrain->PerlinNoise3D(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, dt);
+		}
+
+		ImGui::Text("");
+
+		ImGui::SliderFloat("Terracing Octaves", &terracing_octaves, 1, 6);
+
+		if (ImGui::Button("Terracing Effect"))
+		{
+			m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_octaves, frequency, amplitude);
+		}
+
+		ImGui::Text("");
+
+		ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 30);
+
+		if (ImGui::Button("Brownian"))
+		{
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude);
+		}
+
+		ImGui::Text("");
+
+		ImGui::SliderFloat("Power", &power, 0.1, 8);
+		if (ImGui::Button("Valley"))
+		{
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power, frequency, amplitude);
+		}
+
+		ImGui::Text("");
+
+		ImGui::Text("Erosion");
+
+		if (ImGui::Button("Thermal"))
+		{
+			m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+		}
+
+		ImGui::Text("");
+		ImGui::Checkbox("Use Colour", &use_colours);
 	}
-
-	ImGui::Text("");
-
-	if (ImGui::Button("Flatten"))
-	{
-		m_Terrain->flatten(renderer->getDevice(), renderer->getDeviceContext());
-	}
-
-	if (ImGui::Button("Smooth"))
-	{
-		m_Terrain->smoothing(renderer->getDevice(), renderer->getDeviceContext());
-	}
-
-	if (ImGui::Button("Faultline"))
-	{
-		m_Terrain->FaultLine(renderer->getDevice(), renderer->getDeviceContext());
-	}
-
-	ImGui::Text("");
-
-	ImGui::Text("Functions that use Perlin Noise");
-
-	ImGui::SliderFloat("Frequency", &frequency, 0.01, 0.5);
-	ImGui::SliderInt("Amplitude", &amplitude, 5, 45);
-
-	ImGui::Text("");
-
-	if (ImGui::Button("Perlin"))
-	{
-		m_Terrain->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(),amplitude,frequency);
-	}
-
-	if (ImGui::Button("Rigid Noise"))
-	{	
-		m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);	
-	}
-
-	if (ImGui::Button("Inverse Rigid Noise"))
-	{
-
-		m_Terrain->InverseRigidNoise(renderer->getDevice(), renderer->getDeviceContext(), frequency, amplitude);
-
-	}
-
-	ImGui::Text("");
-
-	ImGui::SliderInt("Terracing Octaves", &terracing_octaves, 1, 100);
-
-	if (ImGui::Button("Terracing Effect"))
-	{
-		m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_octaves, frequency, amplitude);
-	}
-
-	ImGui::Text("");
-
-	ImGui::SliderInt("Brownian Octaves", &brownian_octaves, 1, 30);
 	
-	if (ImGui::Button("Brownian"))
-	{
-		m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), brownian_octaves, frequency, amplitude);
-	}
-
 	ImGui::Text("");
+	ImGui::Checkbox("Enable Water", &enable_water);
 
-	ImGui::SliderFloat("Power", &power, 0.1, 8);
-	if (ImGui::Button("Valley"))
+	if (enable_water)
 	{
-		m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power,frequency, amplitude);
-	}
-
-	ImGui::Text("");
-
-	ImGui::Text("Erosion");
-
-	if (ImGui::Button("Thermal"))
-	{
-		m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+		ImGui::SliderFloat("Water Frequency", &water_frequency, 0.01, 0.5);
+		ImGui::SliderFloat("Water Amplitude", &water_amplitude, 1, 4);
+		ImGui::SliderFloat("Wave Speed", &speed, 0, 4);
+		ImGui::SliderFloat("Water Height", &water_height, -5, 7);
+		ImGui::SliderFloat("Transparent Value", &transparent_value, 0.1, 1.f);
 	}
 
 	ImGui::Text("");
 	ImGui::Checkbox("Edge Detection", &edge_detect);	
 	
-	ImGui::Text("");
-	ImGui::Checkbox("Use Colour", &use_colours);
+
 
 	// Render UI
 	ImGui::Render();
