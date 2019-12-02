@@ -303,6 +303,7 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 	float y1;
 	float y2;
 
+	//get 4 random points on the terrain
 
 	x1 = (float)(rand() % 10000 / 10000.f) *resolution;
 	x2 = (float)(rand() % 10000 / 10000.f) *resolution;
@@ -310,23 +311,24 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 	y1 = (float)(rand() % 10000 / 10000.f) *resolution;
 	y2 = (float)(rand() % 10000 / 10000.f) *resolution;
 
-
+	//create line vector
 	XMFLOAT3 line = XMFLOAT3(x2 - x1, 0, y2 - y1);
 
+	//calculate the height increase value using a random value
 	float height_increase = 5.f - ((float)(rand() % 100) / 100) *10.f;
 
-	for (int y = 0; y < (resolution); y++)
+	for (int y = 0; y < (resolution); y++) //loop for y 
 	{
-		for (int x = 0; x < (resolution); x++)
+		for (int x = 0; x < (resolution); x++) //loop for x
 		{
 
-			XMFLOAT3 point = XMFLOAT3(x1 - x, 0, y1 - y);
+			XMFLOAT3 point = XMFLOAT3(x1 - x, 0, y1 - y); //get point on the terrain
 
-			XMFLOAT3 cross = CrossProd(line, point);
+			XMFLOAT3 cross = CrossProd(line, point); //cross product between the line and point
 
-			if (cross.y > 0)
+			if (cross.y > 0) // if cross value is greater than 0 thne increase the hight by set height increase value
 			{
-				heightMap[(y * resolution) + x] += height_increase;
+				heightMap[(y * resolution) + x] += height_increase; //add value onto heightmap
 			}
 		}
 	}
@@ -538,8 +540,6 @@ void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * de
 	{
 		for (int i = 0; i < (resolution); i++) 
 		{
-			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale };
-
 			noise_value = (abs(heightMap[(j * resolution) + i]));
 			heightMap[(j * resolution) + i] = pow((noise_value), power);//*amplitude;
 		}
@@ -554,22 +554,24 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 	float heightDifference[8];
 	float* _copy = heightMap;
 	float height;
-	float talus = 8/resolution;
-	float c = 0.5;
+	float talus = 4/resolution; //angle at which sediment is dropped
+	float c = 0.5; //constant value
 	float NumberOver = 0.f;
 
 	
-	for (int j = 0; j < (resolution); j++)
+	for (int j = 0; j < (resolution); j++) //loop for y
 	{
-		for (int i = 0; i < (resolution); i++)
+		for (int i = 0; i < (resolution); i++) //loop for x
 		{
 
-			int x1 = j - 1;
+			//4 variables to check Moore neighbourhood (8 surrounding points)
+			int x1 = j - 1; 
 			int x2 = j + 1;
 
 			int y1 = i - 1;
 			int y2 = i + 1;
 
+			//calmp value between 0 and resolution - 1
 			x1 = clamp(x1, 0, resolution - 1);
 			x2 = clamp(x2, 0, resolution - 1);
 			y1 = clamp(y1, 0, resolution - 1);
@@ -577,9 +579,10 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 
 			for (int l = 0; l < 8; l++)
 			{
-				heightDifference[l] = 0;
+				heightDifference[l] = 0; //set all height differences to 0
 			}
 
+			//get difference between point and surrounding 8
 			heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((x1 * resolution) + y1)];
 			heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + y1];
 			heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[(x2 * resolution) + y1];
@@ -593,66 +596,66 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 			float total_dif = 0.f;
 			int over = 0;
 
-			for (int z = 0; z < 8; z++)
+			for (int z = 0; z < 8; z++) //loop for all 8 surrounding points
 			{
 
-				if (heightDifference[z] > talus)
+				if (heightDifference[z] > talus) //check if difference is greater than angle
 				{
-					total_dif += heightDifference[z];
-					NumberOver++;				
+					total_dif += heightDifference[z]; //if is increase total difference
+					NumberOver++;						//keep track of amount of numbers over
 					
-
-				}				
-					if (heightDifference[z] > max_dif)
+					if (heightDifference[z] > max_dif) //find which value is the maximum value
 					{
-						max_dif = heightDifference[z];
+						max_dif = heightDifference[z]; //set max value to new point
 					}
-
+				}
 			}
 
-			if (y1 != i && heightDifference[1] != 0.f && total_dif != 0.f)
-			{
-				_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
+			//chekc all surrounded points are within bound of array, if it is then alter the point using equation
+			if (total_dif != 0.f) 
+			{				
+				if (x1 != j && y1 != i && heightDifference[0] != 0.f )
+				{
+					_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
+				}
+				if (y1 != i && heightDifference[1] != 0.f )
+				{
+					_copy[(j*resolution) + y1] += c * (max_dif - talus) * (heightDifference[1] / total_dif);
+				}
+				if (x1 != j && heightDifference[3] != 0.f)
+				{
+					_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
+				}
+				if (x2 != j && y1 != i && heightDifference[2] != 0.f)
+				{
+					_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
+				}
+				if (x2 != j && heightDifference[4] != 0.f)
+				{
+					_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
+				}
+				if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
+				{
+					_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
+				}
+				if (y1 != i && heightDifference[6] != 0.f)
+				{
+					_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
+				}
+				if (x2 != j && y2 != i && heightDifference[7] != 0.f )
+				{
+					_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
+				}
+				_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif)); //alter the initial point
+				
 			}
-			if (x1 != j && y1 != i && heightDifference[0] != 0.f && total_dif != 0.f)
-			{
-				_copy[(x1*resolution) + y1] += c * (max_dif - talus) * (heightDifference[0] / total_dif);
-			}
-			if (x1 != j && heightDifference[3] != 0.f&& total_dif != 0.f)
-			{
-				_copy[(x1*resolution) + i] += c * (max_dif - talus) * (heightDifference[3] / total_dif);
-			}
-			if (x2 != j && y1 != i && heightDifference[2] != 0.f&& total_dif != 0.f)
-			{
-				_copy[(x2*resolution) + y1] += c * (max_dif - talus) * (heightDifference[2] / total_dif);
-			}
-			if (x2 != j && heightDifference[4] != 0.f && total_dif != 0.f)
-			{
-				_copy[(x2*resolution) + i] += c * (max_dif - talus) * (heightDifference[4] / total_dif);
-			}
-			if (x1 != j && y2 != i && heightDifference[5] != 0.f && total_dif != 0.f)
-			{
-				_copy[(x1*resolution) + y2] += c * (max_dif - talus) * (heightDifference[5] / total_dif);
-			}
-			if (x2 != j && y2 != i && heightDifference[7] != 0.f && total_dif != 0.f)
-			{
-				_copy[((x2*resolution) + y2)] += c * (max_dif - talus) * (heightDifference[7] / total_dif);
-			}
-			if (y1 != i && heightDifference[6] != 0.f && total_dif != 0.f)
-			{
-				_copy[(j*resolution)+y2] += c * (max_dif - talus) * (heightDifference[6] / total_dif);
-			}
-			if (total_dif != 0.f)
-			{
-				_copy[(j *resolution) + (i)] += (max_dif - (NumberOver * max_dif * talus / total_dif));
-			}
+
 		}
 	}
 	
-	heightMap = _copy;
+	heightMap = _copy; // set the copy of the heightmap to the 
 
-
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the new heightmap
 
 }
 

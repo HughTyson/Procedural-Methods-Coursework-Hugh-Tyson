@@ -204,7 +204,9 @@ void WaterMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * devic
 	{
 		for (int i = 0; i < (resolution); i++)
 		{
-			float test[3] = { (float)((i * frequency*scale) + time), (float)j *frequency *scale, (float)time };
+			float test[3] = { (float)((i * frequency*scale)+ time ), ((float)j *frequency *scale) , (float)time };
+				
+				
 
 			heightMap[(j * resolution) + i] = CPerlinNoise::noise3(test)*amplitude;
 		}
