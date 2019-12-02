@@ -1,6 +1,9 @@
 #include "TerrainMesh.h"
 
 #define clamp(value,minimum,maximum) max(min(value,maximum),minimum)
+
+
+
 TerrainMesh::TerrainMesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, int lresolution ) :
 	PlaneMesh( device, deviceContext, lresolution ) 
 {
@@ -216,13 +219,13 @@ void TerrainMesh::Regenerate( ID3D11Device * device, ID3D11DeviceContext * devic
 void TerrainMesh::smoothing(ID3D11Device * device, ID3D11DeviceContext * deviceContext)
 {
 
-	float* _copy = heightMap;
+	float* _copy = heightMap; //create a copy of the heightmap
 
-	for (int y = 0; y < (resolution); y++)
+	for (int y = 0; y < (resolution); y++) //loop for the y axis
 	{
-		for (int x = 0; x < (resolution); x++)
+		for (int x = 0; x < (resolution); x++) // loop for the x axis
 		{
-
+			//declare variables for smoothing on this point
 			float average = 0.f;
 			int values_used = 0;
 			int topL = 0;
@@ -230,6 +233,7 @@ void TerrainMesh::smoothing(ID3D11Device * device, ID3D11DeviceContext * deviceC
 			int bottomL = 0;
 			int bottomR = 0;
 
+			//chekc the 4 surrounding points if they are withing the array boundries
 			if (x != 0)
 			{
 				values_used++;
@@ -257,8 +261,8 @@ void TerrainMesh::smoothing(ID3D11Device * device, ID3D11DeviceContext * deviceC
 			{
 				values_used++;
 				average += heightMap[(y + 1)*resolution + (x)];
-topL += 1;
-topR += 1;
+				topL += 1;
+				topR += 1;
 			}
 
 			if (topL == 2)
@@ -283,15 +287,15 @@ topR += 1;
 			}
 
 
-			average = average / values_used;
+			average = average / values_used; //get the average of the 4 values
 
-			_copy[(y * resolution) + x] = average;
+			_copy[(y * resolution) + x] = average; //set the average value to the original point
 		}
 	}
 
-	heightMap = _copy;
+	heightMap = _copy; //set the heightmaps new value
 
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 
 }
 
@@ -333,7 +337,7 @@ void TerrainMesh::FaultLine(ID3D11Device * device, ID3D11DeviceContext * deviceC
 		}
 	}
 
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 
 }
 
@@ -416,27 +420,27 @@ void TerrainMesh::ParticleDeposition(ID3D11Device * device, ID3D11DeviceContext 
 void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency)
 {
 
-	const float scale = terrainSize / (float)resolution;
+	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
 
-	for (int j = 0; j < (resolution); j++) 
+	for (int j = 0; j < (resolution); j++) //loop for y
 	{
-		for (int i = 0; i < (resolution); i++) 
+		for (int i = 0; i < (resolution); i++) //loop for x
 		{
-			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale};
+			float test[2] = { (float)i * frequency*scale, (float)j *frequency *scale}; //get two points to use in the noise2 function
 
-			heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude;
+			heightMap[(j * resolution) + i] += CPerlinNoise::noise2(test)*amplitude; //get number from perlin function, multiply by amplitude to change height and add value to heightmaps  value
 
 		}
 	}
 
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 
 }
 
 void TerrainMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, float time)
 {
 
-	const float scale = terrainSize / (float)resolution;
+	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
 
 	for (int j = 0; j < (resolution); j++)
 	{
@@ -448,7 +452,7 @@ void TerrainMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * dev
 		}
 	}
 
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 }
 
 void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
@@ -470,32 +474,20 @@ void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * de
 void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float octaves, float frequency, float amplitude)
 {
 
-	//for (int j = 0; j < (resolution); j++) {
-	//	for (int i = 0; i < (resolution); i++) {
-	//		heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i])/ (float)octaves;
-	//	}
-	//}
-
-	float width = octaves;
-	float current_height;
-	float floor_height;
-	float math;
-	float more;
-
-	for (int j = 0; j < (resolution); j++) {
-		for (int i = 0; i < (resolution); i++) {
-
-			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i]) / (float)octaves;
+	for (int j = 0; j < (resolution); j++)  //loop on the y axis
+	{
+		for (int i = 0; i < (resolution); i++) //loop on the x axis
+		{
+			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i]) / octaves; //calculate the rounded value of the value of the height. Divide by user input
 		}
 	}
 
-	Generate_Mesh(device, deviceContext);
-		
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 }
 
 void TerrainMesh::RigidNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float frequency, float amplitude)
 {
-	const float scale = terrainSize / (float)resolution;
+	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
 
 	for (int j = 0; j < (resolution); j++) // loop for resolution - y
 	{
@@ -508,13 +500,13 @@ void TerrainMesh::RigidNoise(ID3D11Device * device, ID3D11DeviceContext * device
 		}
 	}
 
-	Generate_Mesh(device, deviceContext); //change mesh
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 
 }
 
 void TerrainMesh::InverseRigidNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float frequency, float amplitude)
 {
-	const float scale = terrainSize / (float)resolution;
+	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
 
 	for (int j = 0; j < (resolution); j++) // loop for resolution - y
 	{
@@ -527,13 +519,12 @@ void TerrainMesh::InverseRigidNoise(ID3D11Device * device, ID3D11DeviceContext *
 		}
 	}
 
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext);//generate the mesh with the updated heightmap
 }
 
-void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float power, float frequency, float amplitude)
+void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float power)
 {
-
-	const float scale = terrainSize / (float)resolution;
+	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
 	float noise_value;
 
 	for (int j = 0; j < (resolution); j++) 
@@ -541,16 +532,14 @@ void TerrainMesh::Redistribution(ID3D11Device * device, ID3D11DeviceContext * de
 		for (int i = 0; i < (resolution); i++) 
 		{
 			noise_value = (abs(heightMap[(j * resolution) + i]));
-			heightMap[(j * resolution) + i] = pow((noise_value), power);//*amplitude;
+			heightMap[(j * resolution) + i] = pow((noise_value), power);
 		}
 	}
-	Generate_Mesh(device, deviceContext);
-
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 }
 
 void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int erosionIterations)
 {
-
 	float heightDifference[8];
 	float* _copy = heightMap;
 	float height;
@@ -572,6 +561,7 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 			int y2 = i + 1;
 
 			//calmp value between 0 and resolution - 1
+
 			x1 = clamp(x1, 0, resolution - 1);
 			x2 = clamp(x2, 0, resolution - 1);
 			y1 = clamp(y1, 0, resolution - 1);
@@ -582,7 +572,16 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 				heightDifference[l] = 0; //set all height differences to 0
 			}
 
+
+
 			//get difference between point and surrounding 8
+			/*
+				shows which point correspons to where around the Original point (OP)
+				7  6  5
+				4  OP  3
+				2  1  0
+			*/
+
 			heightDifference[0] = heightMap[(j * resolution) + i] - heightMap[((x1 * resolution) + y1)];
 			heightDifference[1] = heightMap[(j * resolution) + i] - heightMap[(j * resolution) + y1];
 			heightDifference[2] = heightMap[(j * resolution) + i] - heightMap[(x2 * resolution) + y1];
@@ -669,7 +668,7 @@ void TerrainMesh::flatten(ID3D11Device * device, ID3D11DeviceContext * deviceCon
 		}
 	}
 	
-	Generate_Mesh(device, deviceContext);
+	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
 
 }
 

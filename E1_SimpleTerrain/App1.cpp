@@ -324,7 +324,7 @@ void App1::gui()
 		ImGui::SliderFloat("Power", &power, 0.1, 1.5);
 		if (ImGui::Button("Valley"))
 		{
-			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power, frequency, amplitude);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power);
 		}
 
 		ImGui::Text("");

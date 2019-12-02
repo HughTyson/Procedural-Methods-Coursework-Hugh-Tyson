@@ -38,12 +38,9 @@ public:
 
 	void InverseRigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
 
-	void Capping(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int cap_height, float frequency, float amplitude);
+	void Redistribution(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float pow);
 
-	void Redistribution(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float pow, float frequency, float amplitude);
-
-	void HydraulicErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float carryingCapacity, float depositionSpeed, int iterations, int drops, float persistence);
-
+	
 private:
 	void CreateBuffers( ID3D11Device* device, VertexType* vertices, unsigned long* indices );
 	void BuildHeightMap();
