@@ -126,7 +126,7 @@ double  CPerlinNoise::noise3(float vec[3])
 		init();
 	}
 
-	//Initialise all our variables on the X & Y
+	//Initialise all our variables on the X & Y & z
 	setup(vec, 0, bx0, bx1, rx0, rx1);
 	setup(vec, 1, by0, by1, ry0, ry1);
 	setup(vec, 2, bz0, bz1, rz0, rz1);

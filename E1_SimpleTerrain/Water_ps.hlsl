@@ -38,7 +38,9 @@ float4 main(InputType input) : SV_TARGET
 {
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
 	float4 textureColor = texture0.Sample(Sampler0, input.tex);
+
 	textureColor.a = transparency_value;
+
 	float4 lightColour = ambientColour + calculateLighting(-lightDirection, input.normal, diffuseColour);
 
 	return lightColour * textureColor;

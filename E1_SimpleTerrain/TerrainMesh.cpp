@@ -221,77 +221,41 @@ void TerrainMesh::smoothing(ID3D11Device * device, ID3D11DeviceContext * deviceC
 
 	float* _copy = heightMap; //create a copy of the heightmap
 
-	for (int y = 0; y < (resolution); y++) //loop for the y axis
+	for (int i = 0; i < 15; i++)
 	{
-		for (int x = 0; x < (resolution); x++) // loop for the x axis
+		for (int y = 0; y < (resolution); y++) //loop for the y axis
 		{
-			//declare variables for smoothing on this point
-			float average = 0.f;
-			int values_used = 0;
-			int topL = 0;
-			int topR = 0;
-			int bottomL = 0;
-			int bottomR = 0;
+			for (int x = 0; x < (resolution); x++) // loop for the x axis
+			{
+				//declare variables for smoothing on this point
+				float average = 0.f;
+				int values_used = 4;
 
-			//chekc the 4 surrounding points if they are withing the array boundries
-			if (x != 0)
-			{
-				values_used++;
-				average += heightMap[(y*resolution) + (x - 1)];
-				bottomL++;
-				bottomR++;
+				//varible to get teh 4 surrounding values
+				int up = y + 1;
+				int down = y - 1;
 
-			}
-			if (x != resolution - 1)
-			{
-				values_used++;
-				average += heightMap[(y*resolution) + (x + 1)];
-				topL += 1;
-				topR += 1;
-			}
+				int left = x - 1;
+				int right = x + 1;
 
-			if (y != 0)
-			{
-				values_used++;
-				average += heightMap[(y - 1)*resolution + (x)];
-				bottomL++;
-				bottomR++;
-			}
-			if (y != resolution - 1)
-			{
-				values_used++;
-				average += heightMap[(y + 1)*resolution + (x)];
-				topL += 1;
-				topR += 1;
-			}
+				up = clamp(up, 0, resolution - 1);
+				down = clamp(down, 0, resolution - 1);
+				left = clamp(left, 0, resolution - 1);
+				right = clamp(right, 0, resolution - 1);
 
-			if (topL == 2)
-			{
-				values_used++;
-				average += heightMap[((y + 1)*resolution) + ((x - 1))];
-			}
-			if (topR == 2)
-			{
-				values_used++;
-				average += heightMap[((y + 1) * resolution) + ((x + 1))];
-			}
-			if (bottomR == 2)
-			{
-				values_used++;
-				average += heightMap[(y - 1)*resolution + ((x + 1))];
-			}
-			if (bottomL == 2)
-			{
-				values_used++;
-				average += heightMap[(y - 1)*resolution + ((x - 1))];
-			}
+				//check the 4 surrounding points if they are within the heightmap
+				average += heightMap[(up * resolution) + x];
+				average += heightMap[(down*resolution) + x];
+				average += heightMap[(y*resolution) + left];
+				average += heightMap[(y*resolution) + right];
 
+				average = average / 4; //get the average of the 4 values
 
-			average = average / values_used; //get the average of the 4 values
-
-			_copy[(y * resolution) + x] = average; //set the average value to the original point
+				_copy[(y * resolution) + x] = average; //set the average value to the original point
+			}
 		}
 	}
+
 
 	heightMap = _copy; //set the heightmaps new value
 
@@ -471,14 +435,14 @@ void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * de
 
 }
 
-void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float octaves, float frequency, float amplitude)
+void TerrainMesh::Terrace(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float terracing_multiplier)
 {
 
 	for (int j = 0; j < (resolution); j++)  //loop on the y axis
 	{
 		for (int i = 0; i < (resolution); i++) //loop on the x axis
 		{
-			heightMap[(j * resolution) + i] = floor(heightMap[(j * resolution) + i]) / octaves; //calculate the rounded value of the value of the height. Divide by user input
+			heightMap[(j * resolution) + i] = round(heightMap[(j * resolution) + i]) / terracing_multiplier; //calculate the rounded value of the value of the height. Divide by user input
 		}
 	}
 
@@ -554,7 +518,10 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 		{
 
 			//4 variables to check Moore neighbourhood (8 surrounding points)
+
 			int x1 = j - 1; 
+			x1 = clamp(x1, 0, resolution - 1);
+
 			int x2 = j + 1;
 
 			int y1 = i - 1;
@@ -562,7 +529,7 @@ void TerrainMesh::ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * de
 
 			//calmp value between 0 and resolution - 1
 
-			x1 = clamp(x1, 0, resolution - 1);
+			
 			x2 = clamp(x2, 0, resolution - 1);
 			y1 = clamp(y1, 0, resolution - 1);
 			y2 = clamp(y2, 0, resolution - 1);

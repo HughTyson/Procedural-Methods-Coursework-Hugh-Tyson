@@ -263,11 +263,6 @@ void App1::gui()
 			m_Terrain->FaultLine(renderer->getDevice(), renderer->getDeviceContext());
 		}
 
-		if (ImGui::Button("Particle Deposition"))
-		{
-			m_Terrain->ParticleDeposition(renderer->getDevice(), renderer->getDeviceContext(), 40, false);
-		}
-
 		ImGui::Text("");
 
 		ImGui::Text("Functions that use Perlin Noise");
@@ -276,8 +271,6 @@ void App1::gui()
 		ImGui::SliderInt("Terrain Amplitude", &amplitude, 5, 45);
 		
 		ImGui::Text("");
-
-
 
 		if (ImGui::Button("Perlin"))
 		{
@@ -296,18 +289,13 @@ void App1::gui()
 
 		}
 
-		if (ImGui::Button("Perlin3D"))
-		{
-			m_Terrain->PerlinNoise3D(renderer->getDevice(), renderer->getDeviceContext(), amplitude, frequency, dt);
-		}
-
 		ImGui::Text("");
 
-		ImGui::SliderFloat("Terracing Octaves", &terracing_octaves, 1, 6);
+		ImGui::SliderFloat("Terracing Multiplier", &terracing_multiplier, 0.1, 1);
 
-		if (ImGui::Button("Terracing Effect"))
+		if (ImGui::Button("Terracing"))
 		{
-			m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_octaves, frequency, amplitude);
+			m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), terracing_multiplier);
 		}
 
 		ImGui::Text("");
@@ -321,8 +309,8 @@ void App1::gui()
 
 		ImGui::Text("");
 
-		ImGui::SliderFloat("Power", &power, 0.1, 1.5);
-		if (ImGui::Button("Valley"))
+		ImGui::SliderFloat("Redistribution Power", &power, 0.1, 1.5);
+		if (ImGui::Button("Redistribution"))
 		{
 			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), power);
 		}

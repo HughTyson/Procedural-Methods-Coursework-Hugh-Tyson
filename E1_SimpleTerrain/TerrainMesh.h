@@ -32,7 +32,7 @@ public:
 
 	void ThermalErosion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int erosionIterations);
 
-	void Terrace(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float octaves, float frequency, float amplitude);
+	void Terrace(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float octaves);
 
 	void RigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
 

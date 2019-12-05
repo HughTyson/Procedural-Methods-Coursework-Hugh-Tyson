@@ -53,7 +53,7 @@ private:
 	bool use_rigidNoise = false;
 	bool use_inverserigidNoise = false;
 
-	float terracing_octaves = 0.4;
+	float terracing_multiplier = 0.4;
 	bool use_Terracing = false;
 
 	bool use_capping = false;
