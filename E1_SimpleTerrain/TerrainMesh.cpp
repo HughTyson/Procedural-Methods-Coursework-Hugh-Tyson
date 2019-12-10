@@ -401,23 +401,7 @@ void TerrainMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * devic
 
 }
 
-void TerrainMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, float time)
-{
 
-	const float scale = terrainSize / (float)resolution; // calculte the scale so terrain looks constant over an increased resolution
-
-	for (int j = 0; j < (resolution); j++)
-	{
-		for (int i = 0; i < (resolution); i++)
-		{
-			float test[3] = { (float)((i * frequency*scale)+ time), (float)j *frequency *scale, (float)time};
-
-			heightMap[(j * resolution) + i] = CPerlinNoise::noise3(test)*amplitude;
-		}
-	}
-
-	Generate_Mesh(device, deviceContext); //generate the mesh with the updated heightmap
-}
 
 void TerrainMesh::BrownianMotion(ID3D11Device * device, ID3D11DeviceContext * deviceContext, int octaves, float frequency, float amplitude)
 {

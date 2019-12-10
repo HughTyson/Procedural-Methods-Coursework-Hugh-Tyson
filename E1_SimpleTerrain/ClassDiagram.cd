@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="App1">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAADUA0GAABBAAgBAIAIEAAMAgUKKgJwAQVBRAEA=</HashCode>
+      <FileName>App1.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPerlinNoise" Collapsed="true">
+    <Position X="13" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAggAAAAAABAAACAyAJAAEAAFIAAAQA=</HashCode>
+      <FileName>CPerlinNoise.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightShader" Collapsed="true">
+    <Position X="11.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICgAAQACCAAAAACAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>LightShader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TerrainMesh" Collapsed="true">
+    <Position X="14" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAABACAEAQAAQAACAAACEAAkAAAAUEAABAUgCAEAAAM=</HashCode>
+      <FileName>TerrainMesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WaterMesh" Collapsed="true">
+    <Position X="9" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAABABAAAQAAAAAAAAACAAAkAAAAEAAAAAkACAEAAAA=</HashCode>
+      <FileName>WaterMesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WaterShader" Collapsed="true">
+    <Position X="11.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICkBAQACAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WaterShader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EdgeDetectionShader" Collapsed="true">
+    <Position X="13.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICgAAQAAAAAAAAAAACBAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>EdgeDetectionShader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PostProcessing" Collapsed="true">
+    <Position X="9.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EgAAIAAAAEAAAAAAAAgWEAAAAAEABAAQAAAAAAAABEA=</HashCode>
+      <FileName>PostProcessing.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextureShader" Collapsed="true">
+    <Position X="13.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICgAAQAACAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TextureShader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

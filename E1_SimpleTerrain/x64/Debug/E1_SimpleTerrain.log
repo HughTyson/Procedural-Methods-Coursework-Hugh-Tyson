@@ -1,17 +1,57 @@
-﻿  TerrainMesh.cpp
+﻿  App1.cpp
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\cperlinnoise.h(50): warning C4244: 'return': conversion from 'double' to 'const float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.h(33): warning C4305: 'initializing': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.h(56): warning C4305: 'initializing': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(61): warning C4305: '=': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(62): warning C4305: '=': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(65): warning C4305: '=': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(270): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(277): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(282): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(288): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(294): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(307): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(312): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(335): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(336): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(338): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(339): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(352): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(354): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(355): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(356): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(361): warning C4305: '=': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(371): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(372): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(380): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(381): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(382): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(383): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(384): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(385): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(386): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(387): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(388): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(397): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.cpp(401): warning C4305: 'argument': truncation from 'double' to 'float'
+  Main.cpp
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\cperlinnoise.h(50): warning C4244: 'return': conversion from 'double' to 'const float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.h(33): warning C4305: 'initializing': truncation from 'double' to 'float'
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\app1.h(56): warning C4305: 'initializing': truncation from 'double' to 'float'
+  TerrainMesh.cpp
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\cperlinnoise.h(50): warning C4244: 'return': conversion from 'double' to 'const float', possible loss of data
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(54): warning C4101: 'indexBufferDesc': unreferenced local variable
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(55): warning C4101: 'vertexData': unreferenced local variable
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(55): warning C4101: 'indexData': unreferenced local variable
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(54): warning C4101: 'vertexBufferDesc': unreferenced local variable
 f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(395): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(415): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(462): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(481): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(510): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(509): warning C4101: 'height': unreferenced local variable
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(659): warning C4101: 'indexBufferDesc': unreferenced local variable
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(660): warning C4101: 'vertexData': unreferenced local variable
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(660): warning C4101: 'indexData': unreferenced local variable
-f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(659): warning C4101: 'vertexBufferDesc': unreferenced local variable
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(446): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(465): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(494): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(493): warning C4101: 'height': unreferenced local variable
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(643): warning C4101: 'indexBufferDesc': unreferenced local variable
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(644): warning C4101: 'vertexData': unreferenced local variable
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(644): warning C4101: 'indexData': unreferenced local variable
+f:\current year work\procedural methods\procedural-methods-coursework---hugh-tyson\e1_simpleterrain\terrainmesh.cpp(643): warning C4101: 'vertexBufferDesc': unreferenced local variable
+  Generating Code...
   E1_SimpleTerrain.vcxproj -> F:\Current Year Work\Procedural Methods\Procedural-Methods-Coursework---Hugh-Tyson\x64\Debug\E1_SimpleTerrain.exe

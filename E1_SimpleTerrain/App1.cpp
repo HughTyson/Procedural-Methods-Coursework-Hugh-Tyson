@@ -91,7 +91,7 @@ bool App1::frame()
 	bool result;
 
 	dt += (timer->getTime() * speed);
-	m_Water->PerlinNoise3D(renderer->getDevice(), renderer->getDeviceContext(), water_amplitude, water_frequency, dt);
+	m_Water->PerlinNoise(renderer->getDevice(), renderer->getDeviceContext(), water_amplitude, water_frequency, dt);
 
 	result = BaseApplication::frame();
 	if (!result)
@@ -326,6 +326,67 @@ void App1::gui()
 
 		ImGui::Text("");
 		ImGui::Checkbox("Use Colour", &use_colours);
+
+		if (ImGui::Button("Preset 1"))
+		{
+
+			m_Terrain->Resize(1024);
+			m_Terrain->Regenerate(renderer->getDevice(), renderer->getDeviceContext());
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 13, 0.01, 45);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 0.3);
+			
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 8, 0.03, 17);
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.044, 19);
+
+			m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+			m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+
+			enable_water = true;
+		}
+
+		if (ImGui::Button("Preset 2"))
+		{
+			
+			m_Terrain->Resize(1024);
+			m_Terrain->Regenerate(renderer->getDevice(), renderer->getDeviceContext());
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 16, 0.01, 31);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 1.5);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 0.7);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 1.23);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 1.15);
+			m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+			m_Terrain->ThermalErosion(renderer->getDevice(), renderer->getDeviceContext(), 1);
+
+			enable_water = true;
+			water_height = 0.276;
+
+			camera->setPosition(15, 45, 45);
+		}
+
+
+		if (ImGui::Button("Preset 3"))
+		{
+			m_Terrain->Resize(1024);
+			m_Terrain->Regenerate(renderer->getDevice(), renderer->getDeviceContext());
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 16, 0.01, 31);
+			m_Terrain->Terrace(renderer->getDevice(), renderer->getDeviceContext(), 0.795);
+			m_Terrain->smoothing(renderer->getDevice(), renderer->getDeviceContext());
+		}
+
+		if (ImGui::Button("Preset 4"))
+		{
+			m_Terrain->Resize(1024);
+			m_Terrain->Regenerate(renderer->getDevice(), renderer->getDeviceContext());
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.01, 9);
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.01, 9);
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.01, 9);
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.01, 9);
+			m_Terrain->RigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.01, 9);
+			m_Terrain->InverseRigidNoise(renderer->getDevice(), renderer->getDeviceContext(), 0.04, 7);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 0.999);
+			m_Terrain->BrownianMotion(renderer->getDevice(), renderer->getDeviceContext(), 8, 0.01, 18);
+			m_Terrain->Redistribution(renderer->getDevice(), renderer->getDeviceContext(), 0.4);
+		}
 	}
 	
 	ImGui::Text("");
@@ -343,7 +404,6 @@ void App1::gui()
 	ImGui::Text("");
 	ImGui::Checkbox("Edge Detection", &edge_detect);	
 	
-
 
 	// Render UI
 	ImGui::Render();

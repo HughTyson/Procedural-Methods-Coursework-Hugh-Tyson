@@ -26,7 +26,7 @@ public:
 	//1D and 2D noise functions
 	static double	noise1( double arg );
 	static double	noise2( float vec[2] );
-	static double	noise3(float vec[3]);
+	
 
 private:
 ///Initialisation///

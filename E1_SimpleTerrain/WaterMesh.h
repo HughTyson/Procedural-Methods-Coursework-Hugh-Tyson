@@ -13,7 +13,7 @@ public:
 
 	const inline int GetResolution() { return resolution; }
 
-	void PerlinNoise3D(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, float time);
+	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, float time);
 	
 private:
 

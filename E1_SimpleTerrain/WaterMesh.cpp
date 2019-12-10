@@ -195,7 +195,7 @@ void WaterMesh::Regenerate(ID3D11Device * device, ID3D11DeviceContext * deviceCo
 	indices = 0;
 }
 
-void WaterMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, float time)
+void WaterMesh::PerlinNoise(ID3D11Device * device, ID3D11DeviceContext * deviceContext, float amplitude, float frequency, float time)
 {
 
 	const float scale = terrainSize / (float)resolution;
@@ -204,11 +204,9 @@ void WaterMesh::PerlinNoise3D(ID3D11Device * device, ID3D11DeviceContext * devic
 	{
 		for (int i = 0; i < (resolution); i++)
 		{
-			float test[3] = { (float)((i * frequency*scale)+ time ), ((float)j *frequency *scale) , (float)time };
+			float test[3] = { (float)((i * frequency*scale)+ time ), ((float)j *frequency *scale)};
 				
-				
-
-			heightMap[(j * resolution) + i] = CPerlinNoise::noise3(test)*amplitude;
+			heightMap[(j * resolution) + i] = CPerlinNoise::noise2(test)*amplitude;
 		}
 	}
 

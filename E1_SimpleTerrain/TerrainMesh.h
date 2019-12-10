@@ -24,8 +24,6 @@ public:
 
 	void PerlinNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency);
 
-	void PerlinNoise3D(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float amplitude, float frequency, float time);
-
 	void BrownianMotion(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int octaves, float frequency, float ampitude);
 
 	void flatten(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
@@ -39,6 +37,7 @@ public:
 	void InverseRigidNoise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float frequency, float amplitude);
 
 	void Redistribution(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float pow);
+
 
 	
 private:
